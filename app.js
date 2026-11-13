@@ -1,7 +1,7 @@
 // ============================================================================
 // 1. CONFIGURAÇÃO DO SUPABASE
 // ============================================================================
-const SUPABASE_URL = 'https://ddkpujfilbkcingsvrgj.supabase.co/rest/v1/';
+const SUPABASE_URL = 'https://ddkpujfilbkcingsvrgj.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_l3uyb9IVq0C_ng7Z_2bnGw_yhftW4TV';
 
 // Inicializa o cliente Supabase
