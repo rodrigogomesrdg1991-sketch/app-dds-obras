@@ -1,0 +1,18 @@
+{
+  "name": "DDS Campo - Segurança",
+  "short_name": "DDS Campo",
+  "description": "Registro de Diálogo Diário de Segurança em Obras",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#d97706",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1161/1161388.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
