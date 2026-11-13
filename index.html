@@ -109,7 +109,7 @@
                 </div>
             </div>
 
-            <!-- Card 2: Lista de Participantes (Empilhado para caber perfeito no celular) -->
+            <!-- Card 2: Lista de Participantes (Ajustado com grid para o botão Adicionar não vazar) -->
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 space-y-3">
                 <div class="flex justify-between items-center">
                     <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">2. Participantes</h2>
@@ -120,13 +120,13 @@
                     <input type="text" id="novoParticipanteNome" placeholder="Nome completo do colaborador"
                         class="w-full p-3 border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none">
                     
-                    <div class="flex gap-2">
+                    <div class="grid grid-cols-3 gap-2">
                         <input type="text" id="novoParticipanteFuncao" placeholder="Função (Ex: Pedreiro)"
-                            class="flex-1 p-3 border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                            class="col-span-2 p-3 border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none">
                         
                         <button type="button" onclick="adicionarParticipante()"
-                            class="bg-slate-800 active:bg-slate-950 text-white font-bold px-5 rounded-xl text-sm shadow-sm transition flex items-center gap-1">
-                            <span>+ Adicionar</span>
+                            class="col-span-1 bg-slate-800 active:bg-slate-950 text-white font-bold py-3 px-1 rounded-xl text-xs shadow-sm transition flex items-center justify-center">
+                            + Adicionar
                         </button>
                     </div>
                 </div>
