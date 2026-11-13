@@ -2,127 +2,185 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DDS Campo | Registro de Segurança</title>
-    <!-- Tailwind CSS via CDN para estilização rápida e responsiva -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>DDS Campo | Segurança</title>
+    
+    <!-- Configurações PWA (Instalação no Celular) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#d97706">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DDS Campo">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1161/1161388.png">
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Bibliotecas para geração de PDF no navegador -->
+    <!-- Bibliotecas PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-    <!-- SDK Oficial do Supabase -->
+    <!-- SDK Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body class="bg-slate-100 text-slate-800 font-sans antialiased pb-12">
 
-    <!-- Cabeçalho Fixo -->
-    <header class="bg-amber-600 text-white shadow-md sticky top-0 z-10">
-        <div class="max-w-2xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div>
-                <h1 class="text-xl font-bold tracking-tight">DDS Campo</h1>
-                <p class="text-xs text-amber-100">Diálogo Diário de Segurança</p>
+    <style>
+        /* Evita zoom automático no iPhone ao tocar em inputs e melhora o toque */
+        input, textarea, select { font-size: 16px !important; }
+        body { -webkit-tap-highlight-color: transparent; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased pb-28 select-none">
+
+    <!-- Cabeçalho Estilo App Nativo -->
+    <header class="bg-amber-600 text-white shadow-md sticky top-0 z-20 pt-safe">
+        <div class="max-w-lg mx-auto px-4 py-3.5 flex justify-between items-center">
+            <div class="flex items-center gap-2.5">
+                <div class="bg-white/20 p-2 rounded-xl">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold leading-tight">DDS Campo</h1>
+                    <p class="text-[11px] text-amber-100">Segurança do Trabalho</p>
+                </div>
             </div>
-            <button onclick="carregarHistorico()" class="bg-amber-700 hover:bg-amber-800 text-xs font-semibold px-3 py-2 rounded-lg transition">
+            <button type="button" onclick="carregarHistorico()" class="bg-amber-700 active:bg-amber-800 text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm transition">
                 Histórico
             </button>
         </div>
     </header>
 
-    <main class="max-w-2xl mx-auto px-4 pt-6 space-y-6">
+    <main class="max-w-lg mx-auto px-3.5 pt-4 space-y-4">
         
-        <!-- Formulário Principal -->
-        <form id="ddsForm" class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-4">
-            <h2 class="text-lg font-bold text-slate-700 border-b pb-2">Novo Registro de DDS</h2>
+        <!-- Banner de Instalação (Aparece automaticamente no Android/Chrome se ainda não instalado) -->
+        <div id="bannerInstalar" class="hidden bg-slate-900 text-white p-3.5 rounded-2xl shadow-md flex items-center justify-between gap-3">
+            <div class="text-xs">
+                <p class="font-bold text-amber-400">Instalar App no Celular</p>
+                <p class="text-slate-300 mt-0.5">Acesse rápido direto da tela inicial na obra.</p>
+            </div>
+            <button type="button" id="btnInstalarApp" class="bg-amber-500 text-slate-950 font-bold text-xs px-3.5 py-2 rounded-xl shrink-0">
+                Instalar
+            </button>
+        </div>
 
-            <!-- Data e Hora -->
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Data e Hora da Visita *</label>
-                <input type="datetime-local" id="dataHora" required
-                    class="w-full p-3 border border-slate-300 rounded-lg bg-slate-50 focus:ring-2 focus:ring-amber-500 focus:outline-none">
+        <!-- Seção de Histórico (Fica no topo quando aberta para fácil visualização) -->
+        <section id="secaoHistorico" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 hidden">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-2.5 mb-3">
+                <h2 class="text-base font-bold text-slate-800">Últimos DDS Salvos</h2>
+                <button type="button" onclick="document.getElementById('secaoHistorico').classList.add('hidden')" class="text-xs font-semibold text-amber-600 px-2 py-1">Fechar</button>
+            </div>
+            <div id="listaHistorico" class="space-y-2.5 text-sm"></div>
+        </section>
+
+        <!-- Formulário Principal Otimizado para Toque -->
+        <form id="ddsForm" class="space-y-4">
+            
+            <!-- Card 1: Dados da Visita -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 space-y-3.5">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">1. Dados da Visita</h2>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Data e Hora *</label>
+                    <input type="datetime-local" id="dataHora" required
+                        class="w-full p-3 border border-slate-300 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Local da Obra / Setor *</label>
+                    <input type="text" id="obraSetor" placeholder="Ex: Obra Alpha - Bloco B" required
+                        class="w-full p-3 border border-slate-300 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Tema Abordado no DDS *</label>
+                    <input type="text" id="tema" placeholder="Ex: Trabalho em altura (NR-35)" required
+                        class="w-full p-3 border border-slate-300 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Responsável / Técnico *</label>
+                    <input type="text" id="responsavel" placeholder="Seu nome" required
+                        class="w-full p-3 border border-slate-300 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Observações / Ocorrências</label>
+                    <textarea id="observacoes" rows="3" placeholder="Recomendações, pontos críticos ou ações..."
+                        class="w-full p-3 border border-slate-300 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none"></textarea>
+                </div>
             </div>
 
-            <!-- Local da Obra / Setor -->
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Local da Obra / Setor *</label>
-                <input type="text" id="obraSetor" placeholder="Ex: Residencial Alpha - Bloco B / Fundação" required
-                    class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
-            </div>
-
-            <!-- Tema Abordado -->
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Tema Abordado no DDS *</label>
-                <input type="text" id="tema" placeholder="Ex: Uso correto de EPIs em trabalho em altura (NR-35)" required
-                    class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
-            </div>
-
-            <!-- Responsável / Técnico -->
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Responsável / Técnico de Segurança *</label>
-                <input type="text" id="responsavel" placeholder="Seu nome completo" required
-                    class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
-            </div>
-
-            <!-- Observações -->
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Observações, Ocorrências ou Recomendações</label>
-                <textarea id="observacoes" rows="3" placeholder="Descreva pontos críticos observados, dúvidas da equipe ou ações corretivas..."
-                    class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"></textarea>
-            </div>
-
-            <!-- Lista de Participantes -->
-            <div class="pt-2 border-t border-slate-200">
-                <label class="block text-sm font-semibold text-slate-700 mb-2">Colaboradores Participantes</label>
+            <!-- Card 2: Lista de Participantes (Empilhado para caber perfeito no celular) -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 space-y-3">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">2. Participantes</h2>
+                    <span id="contadorParticipantes" class="text-xs font-bold bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full">0 presentes</span>
+                </div>
                 
-                <div class="flex gap-2 mb-3">
-                    <input type="text" id="novoParticipanteNome" placeholder="Nome do colaborador"
-                        class="flex-1 p-3 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
-                    <input type="text" id="novoParticipanteFuncao" placeholder="Função (Ex: Pedreiro)"
-                        class="w-1/3 p-3 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
-                    <button type="button" onclick="adicionarParticipante()"
-                        class="bg-slate-800 hover:bg-slate-900 text-white font-bold px-4 rounded-lg text-lg transition">
-                        +
-                    </button>
+                <div class="space-y-2 bg-slate-50 p-3 rounded-xl border border-slate-200/70">
+                    <input type="text" id="novoParticipanteNome" placeholder="Nome completo do colaborador"
+                        class="w-full p-3 border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                    
+                    <div class="flex gap-2">
+                        <input type="text" id="novoParticipanteFuncao" placeholder="Função (Ex: Pedreiro)"
+                            class="flex-1 p-3 border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        
+                        <button type="button" onclick="adicionarParticipante()"
+                            class="bg-slate-800 active:bg-slate-950 text-white font-bold px-5 rounded-xl text-sm shadow-sm transition flex items-center gap-1">
+                            <span>+ Adicionar</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Lista Dinâmica -->
-                <ul id="listaParticipantesUI" class="space-y-2 text-sm">
-                    <!-- Itens inseridos via JS -->
-                </ul>
-                <p id="contadorParticipantes" class="text-xs text-slate-500 mt-2">0 participantes registrados.</p>
+                <ul id="listaParticipantesUI" class="space-y-2"></ul>
             </div>
 
-            <!-- Botões de Ação -->
-            <div class="pt-4 space-y-3">
-                <button type="submit" id="btnSalvar"
-                    class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3.5 px-4 rounded-xl shadow transition flex justify-center items-center gap-2">
-                    <span>Salvar Registro no Banco</span>
-                </button>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <button type="button" onclick="gerarPDF()"
-                        class="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-xl shadow transition text-sm">
-                        Baixar PDF Formal
+            <!-- Barra Fixa Inferior de Ações Rápidas (Polegar) -->
+            <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 p-3 z-20">
+                <div class="max-w-lg mx-auto grid grid-cols-3 gap-2">
+                    <button type="submit" id="btnSalvar"
+                        class="bg-amber-600 active:bg-amber-700 text-white font-bold py-3 px-2 rounded-xl shadow-sm text-xs flex flex-col items-center justify-center gap-0.5">
+                        <span>💾 Salvar</span>
                     </button>
+
+                    <button type="button" onclick="gerarPDF()"
+                        class="bg-red-600 active:bg-red-700 text-white font-bold py-3 px-2 rounded-xl shadow-sm text-xs flex flex-col items-center justify-center gap-0.5">
+                        <span>📄 PDF</span>
+                    </button>
+
                     <button type="button" onclick="compartilharWhatsApp()"
-                        class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-xl shadow transition text-sm">
-                        Enviar WhatsApp
+                        class="bg-emerald-600 active:bg-emerald-700 text-white font-bold py-3 px-2 rounded-xl shadow-sm text-xs flex flex-col items-center justify-center gap-0.5">
+                        <span>📲 WhatsApp</span>
                     </button>
                 </div>
             </div>
+
         </form>
-
-        <!-- Seção de Histórico (Supabase) -->
-        <section id="secaoHistorico" class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 hidden">
-            <div class="flex justify-between items-center border-b pb-2 mb-4">
-                <h2 class="text-lg font-bold text-slate-700">Últimos Registros Salvos</h2>
-                <button onclick="document.getElementById('secaoHistorico').classList.add('hidden')" class="text-xs text-slate-500 underline">Fechar</button>
-            </div>
-            <div id="listaHistorico" class="space-y-3 text-sm">
-                <p class="text-slate-500">Carregando...</p>
-            </div>
-        </section>
-
     </main>
 
     <script src="app.js"></script>
+    <script>
+        // Lógica para botão de instalação PWA no Android/Chrome
+        let deferredPrompt;
+        const bannerInstalar = document.getElementById('bannerInstalar');
+        const btnInstalar = document.getElementById('btnInstalarApp');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            bannerInstalar.classList.remove('hidden');
+        });
+
+        btnInstalar.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    bannerInstalar.classList.add('hidden');
+                }
+                deferredPrompt = null;
+            }
+        });
+    </script>
 </body>
 </html>
