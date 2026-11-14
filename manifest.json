@@ -1,6 +1,6 @@
 {
-  "name": "DDS Campo - Segurança",
-  "short_name": "DDS Campo",
+  "name": "DDS CCB - Segurança",
+  "short_name": "DDS CCB",
   "description": "Registro de Diálogo Diário de Segurança em Obras",
   "start_url": "/index.html",
   "display": "standalone",
