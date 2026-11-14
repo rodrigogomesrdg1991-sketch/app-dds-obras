@@ -167,8 +167,8 @@ async function carregarHistorico() {
 
         if (error) throw error;
 
-        if (data.length === 0) {
-            lista.innerHTML = '<p class="text-slate-500">Nenhum registro encontrado.</p>';
+        if (!data || data.length === 0) {
+            lista.innerHTML = '<p class="text-slate-500">Nenhum registro encontrado no banco.</p>';
             return;
         }
 
@@ -176,14 +176,15 @@ async function carregarHistorico() {
             <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
                 <div class="flex justify-between text-xs text-slate-500 mb-1">
                     <span>${new Date(item.data_hora).toLocaleString('pt-BR')}</span>
-                    <span class="font-semibold text-slate-700">${item.participantes.length} presentes</span>
+                    <span class="font-semibold text-slate-700">${item.participantes ? item.participantes.length : 0} presentes</span>
                 </div>
                 <p class="font-bold text-slate-800">${item.obra_setor}</p>
                 <p class="text-slate-600 text-xs mt-0.5">Tema: ${item.tema}</p>
             </div>
         `).join('');
     } catch (err) {
-        lista.innerHTML = '<p class="text-red-500">Erro ao carregar histórico.</p>';
+        console.error('Detalhe do erro Supabase:', err);
+        lista.innerHTML = `<p class="text-red-500 text-xs font-bold">Erro: ${err.message || 'Falha ao conectar com o banco'}</p>`;
     }
 }
 
