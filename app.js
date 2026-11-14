@@ -76,7 +76,7 @@ function renderizarParticipantes() {
         listaUI.appendChild(li);
     });
 
-    contador.textContent = `${participantes.length} colaborador(s) registrado(s).`;
+    contador.textContent = `${participantes.length} colaborador(es) registrado(s).`;
 }
 
 // ============================================================================
