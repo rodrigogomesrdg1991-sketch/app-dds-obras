@@ -1,15 +1,15 @@
 {
   "name": "DDS CCB - Segurança",
   "short_name": "DDS CCB",
-  "description": "Registro de Diálogo Diário de Segurança em Obras",
+  "description": "Registro de Diálogo Diário de Segurança - CCB",
   "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#f8fafc",
-  "theme_color": "#d97706",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/1161/1161388.png",
+      "src": "brigada-icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
