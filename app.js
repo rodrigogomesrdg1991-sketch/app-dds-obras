@@ -2,7 +2,7 @@
 // 1. CONFIGURAÇÃO DO SUPABASE
 // ============================================================================
 const SUPABASE_URL = 'https://ddkpujfilbkcingsvrgj.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_13uyb9IvQ0C_ng7Z_2bnGw_yhftW4TV';
+const SUPABASE_ANON_KEY = 'sb_publishable_l3uyb9IVq0C_ng7Z_2bnGw_yhftW4TV';
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
